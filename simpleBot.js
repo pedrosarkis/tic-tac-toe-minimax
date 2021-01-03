@@ -81,3 +81,6 @@ const botMove = () => {
     return freeCells[randomNumber];
 }
 
+//TODO 
+//implement my own minimax algorithm 
+//implement alpha beta pruning 
