@@ -23,7 +23,7 @@ const onTurnClick = (e) => {
         makeMove(id, HUMAN);
         const humanWon = checkWin(HUMAN);
         if(checkFreeCells().length && !humanWon) {
-            makeMove(botMove(), AI);
+            makeMove(botMoveAI(), AI);
         } 
     }
 }
@@ -46,8 +46,9 @@ const makeMove = (id, player) => {
     checkWin(player);
 }
 
- const checkWin = (player) => {
-    const plays = board;
+ const checkWin = (player, currentBoard = false) => {
+     
+    const plays = currentBoard || board;
     let winner = false;
     for (let i = 0; i < winningCombination.length; i++) {
        const hasWinner = winningCombination[i].every(combination => plays[combination] === player);
@@ -67,8 +68,10 @@ const makeMove = (id, player) => {
      return allMovesPlayed && !checkWin(player);
  }
 
- const checkFreeCells = () => {
-     return board.filter(cell => typeof cell === 'number');
+ const checkFreeCells = (currentBoard = false) => {
+     debugger;
+     const boardToCheck = currentBoard || board;
+     return boardToCheck.filter(cell => typeof cell === 'number');
  }
 
  const generateRandomNumber = (min, max) => {
@@ -81,15 +84,65 @@ const botMove = () => {
     return freeCells[randomNumber];
 }
 
-const minimax = (boardState, player) => {
-    // logica recursiva do minimax primeiro
-    //dps implementar o pruning
-    let bestMove = {};
+const botMoveAI = () => {
+    return minimax(board, AI).index;
+}
 
-    return bestMove;
+const minimax = (boardState, player) => {
+    
+    const possibleMoves = checkFreeCells(boardState);
+    
+    if(checkWin(boardState, HUMAN)) {
+        return {score: -100}
+    } else if(checkWin(boardState, AI)){
+        return {score: 100}
+    } else if(possibleMoves.length === 0) {
+        return {score: 0}
+    }
+
+    const allTestedMoves = [];
+
+    for( let i =0; i < possibleMoves.length; i++){
+        const currentMove = {};
+
+        currentMove.index = boardState[possibleMoves[i]];
+        boardState[possibleMoves[i]] = player;
+
+        if(player === AI) {
+            const result = minimax(boardState, HUMAN);
+            currentMove.score = result.score;
+        } else {
+            const result = minimax(boardState, AI);
+            currentMove.score = result.score;
+        }
+
+        boardState[possibleMoves[i]] = currentMove.index;
+        allTestedMoves.push(currentMove);
+
+    }
+    let bestTestPlay = null;
+
+    if(player === AI) {
+        let bestScore = -Infinity;
+        for(let i =0; i < allTestedMoves.length; i++) {
+            if(allTestedMoves[i].score > bestScore) {
+                bestScore = allTestedMoves[i].score;
+                bestTestPlay = i;
+            }
+        }
+    } else {
+        let bestScore = Infinity;
+        for(let i =0; i < allTestedMoves.length; i++) {
+            if(allTestedMoves[i].score < bestScore) {
+                bestScore = allTestedMoves[i].score;
+                bestTestPlay = i;
+            }
+        }
+    }
+
+    return allTestedMoves[bestTestPlay];
 
 };
 
 //TODO 
-//implement my own minimax algorithm 
 //implement alpha beta pruning 
