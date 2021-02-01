@@ -81,6 +81,15 @@ const botMove = () => {
     return freeCells[randomNumber];
 }
 
+const minimax = (boardState, player) => {
+    // logica recursiva do minimax primeiro
+    //dps implementar o pruning
+    let bestMove = {};
+
+    return bestMove;
+
+};
+
 //TODO 
 //implement my own minimax algorithm 
 //implement alpha beta pruning 
