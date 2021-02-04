@@ -46,7 +46,7 @@ const makeMove = (id, player) => {
     checkWin(player);
 }
 
- const checkWin = (player, currentBoard = false) => {
+ const checkWin = (player, currentBoard = false, minimaxCheck = false) => {
      
     const plays = currentBoard || board;
     let winner = false;
@@ -54,10 +54,12 @@ const makeMove = (id, player) => {
        const hasWinner = winningCombination[i].every(combination => plays[combination] === player);
        if(hasWinner) {
            winner = true;
-           cells.forEach(cell => {
-               cell.removeEventListener('click', onTurnClick, false);
-           })
-           break;
+           if(!minimaxCheck){
+            cells.forEach(cell => {
+                console.log('eventos removidos');
+                cell.removeEventListener('click', onTurnClick, false);
+            })
+           }
        }
     }
     return winner;
@@ -67,9 +69,8 @@ const makeMove = (id, player) => {
      const allMovesPlayed = board.filter(cell => typeof cell === 'number').length === 0;
      return allMovesPlayed && !checkWin(player);
  }
-
  const checkFreeCells = (currentBoard = false) => {
-     debugger;
+    
      const boardToCheck = currentBoard || board;
      return boardToCheck.filter(cell => typeof cell === 'number');
  }
@@ -89,12 +90,11 @@ const botMoveAI = () => {
 }
 
 const minimax = (boardState, player) => {
-    
     const possibleMoves = checkFreeCells(boardState);
     
-    if(checkWin(boardState, HUMAN)) {
+    if(checkWin(HUMAN, boardState, true)) {
         return {score: -100}
-    } else if(checkWin(boardState, AI)){
+    } else if(checkWin(AI, boardState, true )){
         return {score: 100}
     } else if(possibleMoves.length === 0) {
         return {score: 0}
